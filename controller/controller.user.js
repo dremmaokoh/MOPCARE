@@ -1,7 +1,8 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const Client = require("../models/models.user");
+const Care = require("../models/models.user");
+const cloudinary = require("../utils/cloudinary");
 const { passwordHash, passwordCompare } = require("../helper/hashing");
 const { jwtSign } = require("../helper/jwt");
 const {
@@ -26,10 +27,10 @@ exports.signUp = async (req, res, next) => {
       firstname,
       lastname,
       email,
-      role,
       password,
       confirmPassword,
       phoneNumber,
+      profilePicture
     } = req.body;
 
     if (
@@ -38,8 +39,8 @@ exports.signUp = async (req, res, next) => {
       !email ||
       !password ||
       !confirmPassword ||
-      !phoneNumber || 
-      !role
+      !phoneNumber ||
+      !profilePicture 
     ) {
       return res.status(409).json({
         message: "Please Fill All Fields",
@@ -64,16 +65,18 @@ exports.signUp = async (req, res, next) => {
       });
     }
     const hashedPassword = await passwordHash(password);
+    const result = await cloudinary.uploader.upload(req.file.path);
 
-    const user = new Client({
+    const user = new Care({
       firstname,
       lastname,
       email,
-      role,
       phoneNumber,
       password: hashedPassword,
+      profilePicture: result.secure_url,
       emailtoken: crypto.randomBytes(64).toString("hex"),
-      isVerified: false,
+      role,
+      isVerified,
     });
     const new_user = await user.save();
 
@@ -92,7 +95,7 @@ exports.signUp = async (req, res, next) => {
     const mailOptions = {
       from: ' "Verify your email" <process.env.USER_MAIL>',
       to: user.email,
-      subject: "GoFarmNg - Verify your email",
+      subject: "Mopcare - Verify your email",
       html: `<h2> ${user.firstname} ${user.lastname} </h2> 
               <h2> Thank you for registering on our site  </h2> 
              <h4> Please verify your mail to continue..... </h4>
@@ -124,7 +127,7 @@ exports.signUp = async (req, res, next) => {
 exports.verifyEmail = async (req, res, next) => {
   try {
     const token = req.query.token;
-    const user = await Client.findOne({ emailtoken: token });
+    const user = await Care.findOne({ emailtoken: token });
     if (user) {
       user.emailtoken = null;
       user.isVerified = true;
@@ -185,132 +188,6 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-exports.forgotPassword = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(409).json({
-        message: "Input your email",
-      });
-    }
-    const user = await findUserByEmail(email);
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid Email",
-      });
-    }
-
-    const secret = process.env.JWT_SECRET + user.password;
-    const payload = {
-      email: user.email,
-      id: user._id,
-    };
-    const token = jwt.sign(payload, secret, { expiresIn: "15m" });
-
-    await new Promise((resolve, reject) => {
-      transporter.verify(function (error, success) {
-        if (error) {
-          console.log(error);
-          reject(error);
-        } else {
-          console.log("Server is ready to rake our messages");
-          resolve(success);
-        }
-      });
-    });
-
-    const mailOptions = {
-      from: ' "Verify your email" <process.env.USER_MAIL>',
-      to: user.email,
-      subject: "GoFarmNg - Reset your password",
-      html: `<h2> ${user.firstname} ${user.lastname} </h2> 
-              <h2> Thank you for using GofarmNg  </h2> 
-             <h4> Please click on the link to continue..... </h4>
-             <a href="${process.env.CLIENT_URL}/api/reset-password/${user._id}/${token}">Reset Your Password</a>`,
-    };
-
-    await new Promise((resolve, reject) => {
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log(error);
-          reject(err);
-        } else {
-          console.log("Email Sent");
-          resolve(info);
-        }
-      });
-    });
-    const user_info = {
-      message: "Reset password link is sent to your email",
-    };
-    return res.status(201).json(user_info);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.resetPasswordpage = async (req, res, next) => {
-  try {
-    const { id, token } = req.params;
-
-    const user = await Client.findById({ _id: id });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const secret = process.env.JWT_SECRET + user.password;
-    const payload = jwt.verify(token, secret);
-    res.render("reset-password", { email: user.email });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.resetPassword = async (req, res, next) => {
-  try {
-    const { id, token } = req.params;
-    const { password, confirmPassword } = req.body;
-
-    const user = await Client.findById({ _id: id });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const secret = process.env.JWT_SECRET + user.password;
-    const payload = jwt.verify(token, secret);
-    if (!payload) {
-      throw new Error();
-    }
-    req.user = payload;
-
-    if (!password || !confirmPassword) {
-      return res.status(409).json({
-        message: "Please Fill All Fields",
-      });
-    }
-    if (password != confirmPassword) {
-      return res.status(409).json({
-        message: "The entered passwords do not match!",
-      });
-    }
-    const hashedPassword = await passwordHash(password);
-    if (user) {
-      user.password = hashedPassword;
-      await user.save();
-      const user_info = {
-        message: "Reset Password Successful",
-      };
-      return res.status(201).json(user_info);
-    } else {
-      const no_reset = {
-        message: "Reset Password Not Successful",
-      };
-      return res.status(409).json(no_reset);
-    }
-  } catch (error) {
-    next(error);
-  }
-};
 
 exports.logOut = async (req, res) => {
   res.clearCookie("access_token");
@@ -318,26 +195,6 @@ exports.logOut = async (req, res) => {
     message: "Logout Successful",
   };
   return res.status(201).json(logout);
-};
-
-exports.switchtoSeller = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await findUserByEmail(email);
-    if (!user) {
-      return res.status(409).json({
-        message: "User not found",
-      });
-    }
-    if (user.role === "seller") {
-      return res.status(400).json({ message: "User is already a seller" });
-    }
-    user.role = "seller";
-    await user.save();
-    res.status(200).json({ message: "User role changed to seller" });
-  } catch (error) {
-    res.status(500).send({ message: error.message });
-  }
 };
 
 exports.findAllUsers = async (req, res
@@ -354,7 +211,7 @@ exports.findAllUsers = async (req, res
         size = 10;
       }
       const limit = parseInt(size);
-      const users = await Client.find().sort(
+      const users = await care.find().sort(
         {  _id: 1 }).limit(limit)
   
       res.send({
@@ -373,7 +230,7 @@ exports.findAllUsers = async (req, res
     try {
       
       const id = req.params.id;
-      const find_user = await Client.findById({ _id: id });
+      const find_user = await Care.findById({ _id: id });
       const user_find = {
         message: "User Found",
         find_user,
@@ -381,5 +238,25 @@ exports.findAllUsers = async (req, res
       return res.status(200).json(user_find);
     } catch (error) {
       next(error);
+    }
+  };
+
+  exports.switchRole = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await findUserByEmail(email);
+      if (!user) {
+        return res.status(409).json({
+          message: "User not found",
+        });
+      }
+      if (user.role === "admin") {
+        return res.status(400).json({ message: "User is already an admin" });
+      }
+      user.role = "admin";
+      await user.save();
+      res.status(200).json({ message: "User role changed to admin" });
+    } catch (error) {
+      res.status(500).send({ message: error.message });
     }
   };

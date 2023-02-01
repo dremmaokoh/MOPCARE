@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const userSchema = new mongoose.Schema(
+const careSchema = new mongoose.Schema(
   {
     firstname: {
       type: String,
@@ -43,11 +43,14 @@ const userSchema = new mongoose.Schema(
       enum: ["true", "false"],
       default: "false",
     },
-
+    profilePicture: {
+      type: String,
+      required: [true, "please enter a valid image"],
+    },
     role: {
       type: String,
-      enum: ["buyer", "seller"],
-      default: "buyer",
+      enum: ["user", "admin"],
+      default: "user",
     },
     date: {
       type: Date,
@@ -58,5 +61,4 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-module.exports = mongoose.model("Client", userSchema);
+module.exports = mongoose.model("Care", careSchema);

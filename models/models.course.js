@@ -1,40 +1,33 @@
 const mongoose = require("mongoose");
 
-const farmSchema = new mongoose.Schema(
+const courseSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Client",
+      ref: "Care",
     },
-    product_rating :[{
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Rating',
-     }],
+   
      title: {
       type: String,
       required: [true, "Please enter a valid name"],
     },
 
-    description: {
+    details: {
       type: String,
       required: [true, "Please enter a valid description"],
     },
-    isAvailable: {
-      type: Number,
-      min: 0,
+    link: {
+      type: String,
+      required: [true, "Please enter a valid link"],
     },
-    productPicture: {
+    coursePicture: {
       type: String,
       required: [true, "please enter a valid image"],
-    },
-    cost: {
-      type: Number,
-      required: [true, "Please fill in the cost"],
     },
 
     category: {
       type: String,
-      enum: ["cereals", "fruits", "bakery","dairy","spices","beverages","seafoods","tubers","meat","juices","vegetables","others"],
+      enum: ["educational", "health", "exercise","diet","others"],
       required: [true, "Please fill in the category"],
     },
     date: {
@@ -47,4 +40,4 @@ const farmSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-module.exports = mongoose.model("Product", farmSchema );
+module.exports = mongoose.model("Course", courseSchema);
