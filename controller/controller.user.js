@@ -207,10 +207,10 @@ exports.findAllUsers = async (req, res) => {
     }
 
     if (!size) {
-      size = 10;
+      size = 5;
     }
     const limit = parseInt(size);
-    const users = await care.find().sort({ _id: 1 }).limit(limit);
+    const users = await Care.find().sort({ _id: 1 }).limit(limit);
 
     res.send({
       page,
@@ -264,7 +264,7 @@ exports.updateUser = async (req, res, next) => {
       phoneNumber,
       profilePicture, } =
       req.body;
-    const new_product = await Care.findByIdAndUpdate(
+    const new_user = await Care.findByIdAndUpdate(
       { _id: id },
       { ...req.body },
       {
@@ -273,7 +273,7 @@ exports.updateUser = async (req, res, next) => {
     );
     const user_update = {
       message: "Data updated successfully",
-      new_product,
+      new_user,
     };
     return res.status(200).json(user_update);
   } catch (error) {
