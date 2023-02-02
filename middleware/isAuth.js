@@ -48,21 +48,15 @@ exports.validateVerified = async (req, res, next) => {
 };
 
 exports.validateRole = async (req, res, next) => {
-  try {
-    const user = await Care.findOne({ email: req.body.email });
 
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid Email",
-      });
-    }
-    console.log(user.role);
-    if (user.role == "admin") {
+    try {
+      const user = await Care.findById({ _id: req.user.id });
+      console.log(user.role);
+      if (user.role !== "seller") {
+        return res.status(401).json({ error: "UNATHORIZED!!!" });
+      }
       next();
-    } else {
-      return res.status(401).json({ error: "UNAUTHOIZED" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
     }
-  } catch (error) {
-    return res.status(409).json({ message: error.message });
-  }
-};
+  };
