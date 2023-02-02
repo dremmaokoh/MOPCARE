@@ -49,7 +49,7 @@ exports.validateVerified = async (req, res, next) => {
 
 exports.validateRole = async (req, res, next) => {
   try {
-    const user = await Care.findOne({ email: req.body.email });
+    const user = await Care.findById({ _id: req.user.id })
 
     if (!user) {
       return res.status(400).json({

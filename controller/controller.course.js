@@ -8,7 +8,7 @@ exports.addCourse = async (req, res, next) => {
     const id = req.user.id;
 
     /* Finding the user by the id. */
-    const checkUser = await Care.findById({ _id: id });
+    const checkUser = await Care.findOne({ _id: id });
     if (!checkUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -16,7 +16,7 @@ exports.addCourse = async (req, res, next) => {
     if (checkUser.role !== "admin") {
       return res.status(404).json({ message: "Unauthorized" });
     }
-    const result = await cloudinary.uploader.upload(req.file.path);
+
 
     const new_course = await Course.create({
       title,
