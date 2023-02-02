@@ -55,7 +55,7 @@ exports.findCourses = async (req, res, next) => {
     }
 
     if (!size) {
-      size = 10;
+      size = 5;
     }
     const limit = parseInt(size);
     const latest = await Course.find().sort({ _id: 1 }).limit(limit);
