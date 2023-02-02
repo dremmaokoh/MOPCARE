@@ -20,10 +20,10 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please enter a valid link"],
     },
-    coursePicture: {
-      type: String,
-      required: [true, "please enter a valid image"],
-    },
+    // coursePicture: {
+    //   type: String,
+    //   required: [true, "please enter a valid image"],
+    // },
 
     category: {
       type: String,

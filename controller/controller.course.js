@@ -4,7 +4,7 @@ const cloudinary = require("../utils/cloudinary");
 
 exports.addCourse = async (req, res, next) => {
   try {
-    const { title, details, link, category, coursePicture } = req.body;
+    const { title, details, link, category} = req.body;
     const id = req.user.id;
 
     /* Finding the user by the id. */
@@ -22,8 +22,7 @@ exports.addCourse = async (req, res, next) => {
       title,
       details,
       link,
-      category,
-      coursePicture: result.secure_url,
+      category
     });
 
     return res.status(201).json(new_course);

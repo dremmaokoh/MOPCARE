@@ -46,6 +46,8 @@ exports.signUp = async (req, res, next) => {
         message: "Please Fill All Fields",
       });
     }
+
+
     if (password != confirmPassword) {
       return res.status(409).json({
         message: "The entered passwords do not match!",
@@ -270,7 +272,7 @@ exports.updateUser = async (req, res, next) => {
       }
     );
     const user_update = {
-      message: "Data successfully",
+      message: "Data updated successfully",
       new_product,
     };
     return res.status(200).json(user_update);

@@ -45,7 +45,7 @@ const careSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-   
+     required: [true, "please enter a valid image"],
     },
     role: {
       type: String,
