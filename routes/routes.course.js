@@ -17,7 +17,6 @@ router.post(
 );
 router.get("/findcourse/:id", findSingleCourse);
 router.get("/findallcourses", findCourses);
-router.get("/find/:category",  similarField);
-
+router.get("/find/:category", similarField);
 
 module.exports = router;

@@ -7,16 +7,22 @@ const {
   findAllUsers,
   finduser,
   logOut,
-  switchRole
+  updateUser,
+  switchRole,
 } = require("../controller/controller.user");
-const { isAuth, validateVerified, validateRole  } = require("../middleware/isAuth");
+const {
+  isAuth,
+  validateVerified,
+  validateRole,
+} = require("../middleware/isAuth");
 
-router.post("/register",  upload.single("profilePicture"), signUp);
+router.post("/register", upload.single("profilePicture"), signUp);
 router.post("/login", validateVerified, loginUser);
-router.get("/verify-email", verifyEmail);
+router.get("/verifyemail", verifyEmail);
 router.get("/findusers", validateRole, findAllUsers);
 router.get("/finduser/:id", validateRole, finduser);
+router.post("/switch",isAuth, validateVerified, switchRole);
+router.put("/update/:id", isAuth,  updateUser);
 router.get("/logout", isAuth, logOut);
-
 
 module.exports = router;

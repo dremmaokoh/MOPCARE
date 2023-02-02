@@ -1,6 +1,5 @@
 const Care = require("../models/models.user");
 
-
 exports.findUserByEmail = async (email) => {
   const user = await Care.findOne({
     email,
@@ -20,5 +19,3 @@ exports.findUserByNumber = async (phoneNumber) => {
   }
   return user;
 };
-
-

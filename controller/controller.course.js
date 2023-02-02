@@ -4,10 +4,8 @@ const cloudinary = require("../utils/cloudinary");
 
 exports.addCourse = async (req, res, next) => {
   try {
-    const { title, details, link, category, coursePicture } =
-      req.body;
+    const { title, details, link, category, coursePicture } = req.body;
     const id = req.user.id;
-
 
     /* Finding the user by the id. */
     const checkUser = await Care.findById({ _id: id });
@@ -21,11 +19,15 @@ exports.addCourse = async (req, res, next) => {
     const result = await cloudinary.uploader.upload(req.file.path);
 
     const new_course = await Course.create({
-      title, details, link, category, coursePicture : result.secure_url
+      title,
+      details,
+      link,
+      category,
+      coursePicture: result.secure_url,
     });
 
-    return res.status(201).json(new_course );
-  } catch (error)  {
+    return res.status(201).json(new_course);
+  } catch (error) {
     next(error);
   }
 };
@@ -44,11 +46,10 @@ exports.findSingleCourse = async (req, res, next) => {
   }
 };
 
-
 exports.findCourses = async (req, res, next) => {
   try {
     let { page, size, sort } = req.query;
-  
+
     // If the page is not applied in query
     if (!page) {
       page = 1;
@@ -58,19 +59,16 @@ exports.findCourses = async (req, res, next) => {
       size = 10;
     }
     const limit = parseInt(size);
-    const latest = await Course.find().sort(
-      {  _id: 1 }).limit(limit)
+    const latest = await Course.find().sort({ _id: 1 }).limit(limit);
 
     res.send({
       page,
       size,
       Info: latest,
     });
-  }
-  catch (error) {
+  } catch (error) {
     res.sendStatus(500);
   }
-  
 };
 
 exports.similarField = async (req, res, next) => {
@@ -88,4 +86,3 @@ exports.similarField = async (req, res, next) => {
     next(error);
   }
 };
-

@@ -30,7 +30,8 @@ exports.signUp = async (req, res, next) => {
       password,
       confirmPassword,
       phoneNumber,
-      profilePicture
+      role,
+      profilePicture,
     } = req.body;
 
     if (
@@ -39,8 +40,7 @@ exports.signUp = async (req, res, next) => {
       !email ||
       !password ||
       !confirmPassword ||
-      !phoneNumber ||
-      !profilePicture 
+      !phoneNumber 
     ) {
       return res.status(409).json({
         message: "Please Fill All Fields",
@@ -76,7 +76,7 @@ exports.signUp = async (req, res, next) => {
       profilePicture: result.secure_url,
       emailtoken: crypto.randomBytes(64).toString("hex"),
       role,
-      isVerified,
+      isVerified: false,
     });
     const new_user = await user.save();
 
@@ -188,7 +188,6 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-
 exports.logOut = async (req, res) => {
   res.clearCookie("access_token");
   const logout = {
@@ -197,66 +196,85 @@ exports.logOut = async (req, res) => {
   return res.status(201).json(logout);
 };
 
-exports.findAllUsers = async (req, res
-  ) => {
-    try {
-      let { page, size, sort } = req.query;
-  
-      
-      if (!page) {
-        page = 1;
-      }
-  
-      if (!size) {
-        size = 10;
-      }
-      const limit = parseInt(size);
-      const users = await care.find().sort(
-        {  _id: 1 }).limit(limit)
-  
-      res.send({
-        page,
-        size,
-        Info: users,
+exports.findAllUsers = async (req, res) => {
+  try {
+    let { page, size, sort } = req.query;
+
+    if (!page) {
+      page = 1;
+    }
+
+    if (!size) {
+      size = 10;
+    }
+    const limit = parseInt(size);
+    const users = await care.find().sort({ _id: 1 }).limit(limit);
+
+    res.send({
+      page,
+      size,
+      Info: users,
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
+};
+
+exports.finduser = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const find_user = await Care.findById({ _id: id });
+    const user_find = {
+      message: "User Found",
+      find_user,
+    };
+    return res.status(200).json(user_find);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.switchRole = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(409).json({
+        message: "User not found",
       });
     }
-    catch (error) {
-      res.sendStatus(500);
+    if (user.role === "admin") {
+      return res.status(400).json({ message: "User is already an admin" });
     }
-    
-  };
+    user.role = "admin";
+    await user.save();
+    res.status(200).json({ message: "User role changed to admin" });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
 
-  exports.finduser = async (req, res, next) => {
-    try {
-      
-      const id = req.params.id;
-      const find_user = await Care.findById({ _id: id });
-      const user_find = {
-        message: "User Found",
-        find_user,
-      };
-      return res.status(200).json(user_find);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  exports.switchRole = async (req, res) => {
-    try {
-      const { email } = req.body;
-      const user = await findUserByEmail(email);
-      if (!user) {
-        return res.status(409).json({
-          message: "User not found",
-        });
+exports.updateUser = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const { firstname,
+      lastname,
+      phoneNumber,
+      profilePicture, } =
+      req.body;
+    const new_product = await Care.findByIdAndUpdate(
+      { _id: id },
+      { ...req.body },
+      {
+        new: true,
       }
-      if (user.role === "admin") {
-        return res.status(400).json({ message: "User is already an admin" });
-      }
-      user.role = "admin";
-      await user.save();
-      res.status(200).json({ message: "User role changed to admin" });
-    } catch (error) {
-      res.status(500).send({ message: error.message });
-    }
-  };
+    );
+    const user_update = {
+      message: "Data successfully",
+      new_product,
+    };
+    return res.status(200).json(user_update);
+  } catch (error) {
+    next(error);
+  }
+};

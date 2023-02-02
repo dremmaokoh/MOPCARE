@@ -6,8 +6,8 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Care",
     },
-   
-     title: {
+
+    title: {
       type: String,
       required: [true, "Please enter a valid name"],
     },
@@ -27,14 +27,13 @@ const courseSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["educational", "health", "exercise","diet","others"],
+      enum: ["educational", "health", "exercise", "diet", "others"],
       required: [true, "Please fill in the category"],
     },
     date: {
       type: Date,
       default: Date.now(),
     },
- 
   },
   {
     timestamps: true,

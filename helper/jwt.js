@@ -6,7 +6,7 @@ const { JWT_SECRET } = process.env;
 
 const jwtSign = (payload) => {
   return jwt.sign(payload, JWT_SECRET, {
-   // expiresIn: "1h",
+    // expiresIn: "1h",
   });
 };
 
