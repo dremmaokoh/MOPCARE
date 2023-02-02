@@ -19,10 +19,11 @@ const {
 router.post("/register", upload.single("profilePicture"), signUp);
 router.post("/login", validateVerified, loginUser);
 router.get("/verifyemail", verifyEmail);
-router.get("/findusers", validateRole, findAllUsers);
-router.get("/finduser/:id", validateRole, finduser);
+router.get("/findusers", isAuth, validateVerified, findAllUsers);
+router.get("/finduser/:id", isAuth, validateVerified, finduser);
 router.post("/switch",isAuth, validateVerified, switchRole);
 router.put("/update/:id", isAuth,  updateUser);
 router.get("/logout", isAuth, logOut);
 
 module.exports = router;
+
