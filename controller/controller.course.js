@@ -36,7 +36,7 @@ exports.findSingleCourse = async (req, res, next) => {
     const id = req.params.id;
     const find_product = await Course.findById({ _id: id });
     const product_find = {
-      message: "Product Found",
+      message: "Course Found",
       find_product,
     };
     return res.status(200).json(product_find);
