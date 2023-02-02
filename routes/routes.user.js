@@ -21,7 +21,7 @@ router.post("/login", validateVerified, loginUser);
 router.get("/verifyemail", verifyEmail);
 router.get("/findusers", isAuth, validateRole, findAllUsers);
 router.get("/finduser/:id", isAuth, validateRole, finduser);
-router.put("/update/:id", isAuth,  updateUser);
+router.put("/update/:id", isAuth, upload.single("profilePicture"), updateUser);
 router.post("/admin", isAuth, validateVerified, switchRole);
 router.get("/logout", isAuth, logOut);
 

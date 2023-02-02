@@ -12,7 +12,6 @@ router.post(
   "/course",
   isAuth,
   validateRole,
-  upload.single("coursePicture"),
   addCourse
 );
 router.get("/findcourse/:id", findSingleCourse);

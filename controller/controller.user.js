@@ -264,9 +264,13 @@ exports.updateUser = async (req, res, next) => {
       phoneNumber,
       profilePicture, } =
       req.body;
+      const result = await cloudinary.uploader.upload(req.file.path);
     const new_user = await Care.findByIdAndUpdate(
       { _id: id },
-      { ...req.body },
+      { firstname,
+        lastname,
+        phoneNumber,
+        profilePicture :result.secure_url },
       {
         new: true,
       }
