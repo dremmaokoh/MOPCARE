@@ -40,13 +40,12 @@ exports.signUp = async (req, res, next) => {
       !email ||
       !password ||
       !confirmPassword ||
-      !phoneNumber 
+      !phoneNumber
     ) {
       return res.status(409).json({
         message: "Please Fill All Fields",
       });
     }
-
 
     if (password != confirmPassword) {
       return res.status(409).json({
@@ -259,18 +258,11 @@ exports.switchRole = async (req, res) => {
 exports.updateUser = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const { firstname,
-      lastname,
-      phoneNumber,
-      profilePicture, } =
-      req.body;
-      const result = await cloudinary.uploader.upload(req.file.path);
+    const { firstname, lastname, phoneNumber, profilePicture } = req.body;
+    const result = await cloudinary.uploader.upload(req.file.path);
     const new_user = await Care.findByIdAndUpdate(
       { _id: id },
-      { firstname,
-        lastname,
-        phoneNumber,
-        profilePicture :result.secure_url },
+      { firstname, lastname, phoneNumber, profilePicture: result.secure_url },
       {
         new: true,
       }

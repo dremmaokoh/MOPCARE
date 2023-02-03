@@ -26,4 +26,3 @@ router.post("/admin", isAuth, validateVerified, switchRole);
 router.get("/logout", isAuth, logOut);
 
 module.exports = router;
-

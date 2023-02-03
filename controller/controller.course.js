@@ -4,7 +4,7 @@ const cloudinary = require("../utils/cloudinary");
 
 exports.addCourse = async (req, res, next) => {
   try {
-    const { title, details, link, category} = req.body;
+    const { title, details, link, category } = req.body;
     const id = req.user.id;
 
     /* Finding the user by the id. */
@@ -17,12 +17,11 @@ exports.addCourse = async (req, res, next) => {
       return res.status(404).json({ message: "Unauthorized" });
     }
 
-
     const new_course = await Course.create({
       title,
       details,
       link,
-      category
+      category,
     });
 
     return res.status(201).json(new_course);
@@ -89,8 +88,7 @@ exports.similarField = async (req, res, next) => {
 exports.updateCourse = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const { title, category, details, link } =
-      req.body;
+    const { title, category, details, link } = req.body;
     const new_product = await Course.findByIdAndUpdate(
       { _id: id },
       { ...req.body },
