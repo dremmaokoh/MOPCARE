@@ -111,12 +111,12 @@ exports.updateCourse = async (req, res, next) => {
 exports.deleteCourse = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const delete_course = await Product.findByIdAndDelete({ _id: id });
+    const delete_course = await Care.findByIdAndDelete({ _id: id });
     const course_delete = {
       message: "Course Deleted",
       delete_course,
     };
-    return res.status(200).json(product_course);
+    return res.status(200).json(course_delete);
   } catch (error) {
     next(error);
   }
