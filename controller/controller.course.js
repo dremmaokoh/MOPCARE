@@ -85,3 +85,39 @@ exports.similarField = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateCourse = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const { title, category, details, link } =
+      req.body;
+    const new_product = await Course.findByIdAndUpdate(
+      { _id: id },
+      { ...req.body },
+      {
+        new: true,
+      }
+    );
+    const course_update = {
+      message: "Updated successfully",
+      new_product,
+    };
+    return res.status(200).json(course_update);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteCourse = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const delete_course = await Product.findByIdAndDelete({ _id: id });
+    const course_delete = {
+      message: "Course Deleted",
+      delete_course,
+    };
+    return res.status(200).json(product_course);
+  } catch (error) {
+    next(error);
+  }
+};
